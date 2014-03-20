@@ -2,12 +2,6 @@ class Stop
 
   attr_reader :train_id, :station_id, :id
 
-  def initialize(attributes)
-    @train_id = attributes['train_id']
-    @station_id = attributes['station_id']
-    @id = attributes['id']
-  end
-
   def self.all
     stops = []
     results = DB.exec("SELECT * FROM stops")
@@ -17,15 +11,8 @@ class Stop
     stops
   end
 
-  def duplicate_stop_check
-    Stop.all.each do |stop|
-      if stop.train_id == self.train_id && stop.station_id == self.station_id
-        return true
-      else
-        return false
-      end
-    end
-
+  def self.delete_route(train)
+    DB.exec("DELETE FROM stops WHERE train_id = '#{train}';")
   end
 
   def self.train_stops(input_id)
@@ -56,6 +43,31 @@ class Stop
       end
     end
     train_name
+  end
+
+  def initialize(attributes)
+    @train_id = attributes['train_id']
+    @station_id = attributes['station_id']
+    @id = attributes['id']
+  end
+
+  def duplicate_stop_check
+    Stop.all.each do |stop|
+      if stop.train_id == self.train_id && stop.station_id == self.station_id
+        return true
+      else
+        return false
+      end
+    end
+  end
+
+  def delete_stop
+    DB.exec("DELETE FROM stops WHERE train_id = '#{self.train_id}' AND station_id = '#{self.station_id}';")
+  end
+
+  def self.update(hash)
+    DB.exec("UPDATE stops SET station_id = '#{hash['new_station']}' WHERE train_id = '#{hash['train']}' AND station_id = '#{hash['old_station']}';")
+    @station_id = hash['new_station']
   end
 
   def ==(another_stop)

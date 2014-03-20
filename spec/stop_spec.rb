@@ -55,12 +55,33 @@ describe Stop do
       test_stop2.duplicate_stop_check.should eq true
     end
   end
-  describe 'delete' do
+  describe 'delete_stop' do
     it 'should remove stops' do
       test_stop = Stop.new({"train_id" => '1', "station_id" => '1'})
       test_stop.save
-      test_stop.delete
+      test_stop.delete_stop
       Stop.all.should eq []
     end
   end
+  describe 'delete_route' do
+    it 'should remove an entire route for a train' do
+      test_stop = Stop.new({"train_id" => '1', "station_id" => '1'})
+      test_stop2 = Stop.new({"train_id" => '1', "station_id" => '1'})
+      test_stop3 = Stop.new({"train_id" => '2', "station_id" => '1'})
+      test_stop3.save
+      test_stop.save
+      test_stop2.save
+      Stop.delete_route('1')
+      Stop.all.should eq [test_stop3]
+    end
+  end
+  describe 'update' do
+    it 'will change the station for a stop' do
+      test_stop = Stop.new({"train_id" => '1', "station_id" => '1'})
+      test_stop.save
+      Stop.update({"old_station" => "1", "train" => "1", "new_station" => "4"})
+      Stop.all.last.station_id.should eq "4"
+    end
+  end
 end
+

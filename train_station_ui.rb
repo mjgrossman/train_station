@@ -31,6 +31,7 @@ def operator_main_menu
   puts "To list all trains press - LT"
   puts "To list all stations press - LS"
   puts "To create a route press - R"
+  puts "To edit a route press - E"
   puts "To return to main menu press - M"
 
   case gets.chomp.upcase
@@ -49,12 +50,35 @@ def operator_main_menu
     when "AS"
       add_station
       operator_main_menu
+    when "E"
+      edit_route
+      operator_main_menu
     when "M"
       main_menu
     else
       "Not a valid input"
       operator_main_menu
     end
+end
+
+def edit_route
+  edit_hash = {}
+  list_train
+  puts "\nEnter the ID number of the train you would like to view a route for:"
+  edit_hash['train'] = gets.chomp
+  puts "\nList of stations on that route:"
+  Stop.train_stops(edit_hash['train']).each do |station|
+    puts "#{station['id']}) #{station['name']}"
+  end
+  puts "Pick a station to change its station"
+  edit_hash['old_station'] = gets.chomp
+  list_station
+  puts "Pick a new station"
+  edit_hash['new_station'] = gets.chomp
+  Stop.update(edit_hash)
+  Stop.train_stops(edit_hash['train']).each do |station|
+    puts "#{station['id']}) #{station['name']}"
+  end
 end
 
 def add_train
@@ -89,7 +113,7 @@ end
 
 def create_route
   puts "\nList of all trains:"
-  Train.all.each do |train|
+  available_trains.each do |train|
     puts "#{train.id}) #{train.name}"
   end
   puts "=========="
@@ -159,6 +183,26 @@ def view_stations
   Stop.station_arrivals(gets.chomp).each do |train|
     puts "#{train['id']}) #{train['name']}"
   end
+end
+
+# def available_stations
+#   stations = Station.all
+#   stations.each do |station|
+#     Stop.all.each do |stop|
+#       stations.delete_if { |station| station.id == stop.station_id }
+#     end
+#   end
+#   stations
+# end
+
+def available_trains
+  trains = Train.all
+  trains.each do |train|
+    Stop.all.each do |stop|
+      trains.delete_if { |train| train.id == stop.train_id }
+    end
+  end
+  trains
 end
 
 main_menu

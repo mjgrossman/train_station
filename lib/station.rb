@@ -24,15 +24,4 @@ class Station
     end
     stations
   end
-
-  # def self.find(station_id)
-  #   results = DB.exec("SELECT * FROM station WHERE id = '#{station_id}';")
-  #   found_station = ''
-  #     results.each do |result|
-  #       found_station << result['name']
-  #     end
-  #     found_station
-  # end
-
-
 end
